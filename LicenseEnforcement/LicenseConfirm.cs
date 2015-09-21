@@ -86,6 +86,15 @@ namespace LicenseEnforcement
             // The signature used to verify the hash
             byte[] signature = Convert.FromBase64String(licenseFile.DocumentElement.SelectSingleNode(@"/LicenseInfo/SignedKey").InnerText);
 
+            string savedLicenseKey = licenseFile.DocumentElement.SelectSingleNode(@"/LicenseInfo/KEY").InnerText;
+            string truncatedMachineName = savedLicenseKey.Substring(savedLicenseKey.LastIndexOf(@"/") + 5);
+
+            // If license is not licensed to this computer
+            if (Environment.MachineName.Substring(0, truncatedMachineName.Length) != truncatedMachineName)
+            {   
+                return false;
+            }
+
             // If the signature is valid, return true
             if (rsaDeformatter.VerifySignature(hash, signature))
             {
