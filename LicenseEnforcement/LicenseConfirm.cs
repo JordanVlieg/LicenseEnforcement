@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 using System.Xml;
@@ -11,6 +12,18 @@ namespace LicenseEnforcement
         {
             // The license key, it must be 20 bytes long to be compatible with RSA
             string licenseKey = DateTime.Now.Date.AddMonths(months).ToShortDateString();
+            // If a current license exists, add the new license length onto the old one.
+            if (File.Exists(Environment.CurrentDirectory + @"\licenseinfo.xml"))
+            {
+                XmlDocument licenseFile = new XmlDocument();
+                licenseFile.Load(Environment.CurrentDirectory + @"\licenseinfo.xml");
+                string savedLicenseKey = licenseFile.DocumentElement.SelectSingleNode(@"/LicenseInfo/KEY").InnerText;
+                string licenseExpiry = savedLicenseKey.Substring(0, savedLicenseKey.LastIndexOf(@"/") + 5);
+                if (Convert.ToDateTime(licenseExpiry) > DateTime.Today)
+                {
+                    licenseKey = (Convert.ToDateTime(licenseExpiry).AddMonths(months)).ToShortDateString();
+                }
+            }
             string machineName = Environment.MachineName;
             licenseKey += machineName;
             // Adds trailing 0's if the date+machinename is less than 20 charachters

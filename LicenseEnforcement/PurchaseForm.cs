@@ -11,7 +11,7 @@ namespace LicenseEnforcement
             InitializeComponent();
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void btnPurchase_Click(object sender, EventArgs e)
         {
             if (cxbPaymentInfo.SelectedItem != null)
             {
